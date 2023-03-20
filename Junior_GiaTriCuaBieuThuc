@@ -1,0 +1,61 @@
+#include <bits/stdc++.h>
+using namespace std ;
+
+#define ll long long
+
+ll a[15], c[15], t, n, m ;
+bool b[15], kq = 0 ;
+string s ;
+
+void dq(ll i) {
+	if(i > n) {
+		stack<ll> ope ; stack<char> dau ; ll v = 0 ; ope.push(0) ; dau.push('+') ;
+		for(ll j = 0; j < s.size(); j ++) {
+			if(s[j] == '+') dau.push('+') ;
+			else if(s[j] == '-') dau.push('-') ;
+			else if(s[j] == '*') dau.push('*') ;
+			else if(s[j] == '(') dau.push('(') ;
+			else if('a' <= s[j] && s[j] <= 'z') {
+				if(dau.top() == '(') ope.push(c[++ v]) ;
+				else {
+					ll x = ope.top() ; ope.pop() ;
+					if(dau.top() == '+') ope.push(x + c[++ v]), dau.pop() ;
+					else if(dau.top() == '-') ope.push(x - c[++ v]), dau.pop() ;
+					else if(dau.top() == '*') ope.push(x * c[++ v]), dau.pop() ;
+				}
+			}
+			else if(s[j] == ')') {
+				dau.pop() ;
+				while(!dau.empty() && dau.top() != '(') {
+					ll x = ope.top() ; ope.pop() ; ll y = ope.top() ; ope.pop() ;
+					if(dau.top() == '+') ope.push(y + x) ;
+					else if(dau.top() == '-') ope.push(y - x) ;
+					else if(dau.top() == '*') ope.push(y * x) ;
+					dau.pop() ;
+				}
+			}
+		}
+		if(ope.top() == m) kq = 1 ;
+	}
+	else if(kq == 1) return ;
+	else {
+		for(ll j = 1; j <= n; j ++) {
+			if(b[j]) continue ;
+			c[i] = a[j] ; b[j] = 1 ;
+			dq(i + 1) ; b[j] = 0 ;
+			if(kq == 1) return ;
+		}
+	}
+}
+
+int main() {
+	cin >> t ;
+	while(t --) {
+		cin >> n ;
+		for(ll i = 1; i <= n; i ++) cin >> a[i] ;
+		cin >> m >> s ; kq = 0 ;
+		dq(1) ;
+		if(kq) cout << "YES\n" ;
+		else cout << "NO\n" ;
+	}
+}
