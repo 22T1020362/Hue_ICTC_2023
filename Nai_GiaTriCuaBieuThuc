@@ -1,0 +1,98 @@
+#include<bits/stdc++.h>
+using namespace std;
+int n,m,dem,ktr[N],a[N],b[N],kt;
+string s,st;
+
+int get()
+{
+    int cnt=0;
+    vector<int>s={};
+    vector<char>dau={};
+   // for(int i=1;i<=dem;i++)cout<<b[i]<<" ";cout<<endl;
+    for(auto ch:st)
+    {
+       // cout<<ch<<endl;
+        if(ch=='-'||ch=='+'||ch=='*')
+            dau.pb(ch);
+        if(ch>='a'&&ch<='z')
+            s.pb(b[++cnt]);
+        if(ch==')')
+        {
+            int B=s.back();
+            s.pop_back();
+            int A=s.back();
+            s.pop_back();
+            if(dau.back()=='-')
+            {
+                A=A-B;
+            }
+            if(dau.back()=='+')
+            {
+                A=A+B;
+            }
+            if(dau.back()=='*')
+            {
+                A=A*B;
+            }
+            s.pb(A);
+            dau.pop_back();
+        }
+    }
+   // cout<<s[0]<<endl;
+    return s[0];
+}
+
+void vet(int pos)
+{
+    if(pos==dem+1)
+    {
+     //   for(int i=0;i<=dem;i++)cout<<b[i]<<" ";cout<<endl;cout<<get()<<endl;
+        if(get()==m)
+            kt=1;
+        return;
+    }
+    for(int i=1;i<=n;i++)
+        if(ktr[i]==0)
+        {
+            ktr[i]=1;
+            b[pos]=a[i];
+            vet(pos+1);
+            ktr[i]=0;
+        }
+}
+
+void xuli()
+{
+    cin>>n;
+    for(int i=1;i<=n;i++)
+        cin>>a[i];
+    cin>>m>>s;
+    st=s;
+    s=s;
+    dem=0;
+    int cnt=0;
+    for(auto ch:s)
+    {
+        if(ch>='a'&&ch<='z')
+            dem++;
+    }
+    kt=0;
+    vet(1);
+    if(kt==1)cout<<"YES\n";else cout<<"NO\n";
+}
+
+int32_t main()
+{
+    #ifdef SKY
+    freopen("A.inp","r",stdin);
+    freopen("A.out","w",stdout);
+    #endif // SKY
+    ios::sync_with_stdio(0);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    int q;
+    cin>>q;
+    while(q--)
+        xuli();
+    return 0;
+}
