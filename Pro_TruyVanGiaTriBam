@@ -1,0 +1,113 @@
+#include<bits/stdc++.h>
+#define X first
+#define Y second
+#define FOR(i, a, b) for (int i = (a); i <= (b); i++)
+#define FORD(i, b, a) for (int i = (b); i >= (a); i--)
+#define REP(i, a, b) for (int i = (a); i < (b); i++)
+#define all(x) begin(x), end(x)
+#define SQR(x) (1LL * (x) * (x))
+#define MASK(x) (1LL << (x))
+#define left Left
+#define right Right
+
+using namespace std;
+
+typedef long long ll;
+typedef double db;
+typedef long double ld;
+typedef pair<int, int> pii;
+typedef pair<int, pii> piii;
+typedef pair<ll, ll> pll;
+typedef pair<ll, pll> plll;
+typedef pair<ll, int> pli;
+typedef pair<ll, pii> plii;
+
+template<class A, class B>
+    bool maximize(A& x, B y) {
+        if (x < y) return x = y, true; else return false;
+    }
+template<class A, class B>
+    bool minimize(A& x, B y) {
+        if (x < y) return x = y, true; else return false;
+    }
+/* END OF TEMPLATE */
+
+const int N = 1e5 + 7;
+
+ll mod, base = 31;
+
+string s;
+
+int n, q;
+
+ll p[N];
+
+struct SegmentTree {
+    ll st[4 * N];
+    SegmentTree() {
+        REP(i, 0, 4 * N) st[i] = 0;
+    }
+    void build(int id, int l, int r) {
+        if (l == r) {
+            st[id] = (s[l] - 'a' + 1) % mod;
+            return ;
+        }
+        int mid = (l + r) >> 1;
+        build(id * 2, l, mid);
+        build(id * 2 + 1, mid + 1, r);
+        st[id] = (st[id * 2] * p[r - mid] % mod + st[id * 2 + 1]) % mod;
+    }
+    void update(int id, int l, int r, int i, char c) {
+        if (l > i || r < i) return ;
+        if (l == r) {
+            st[id] = (c - 'a' + 1) % mod;
+            return ;
+        }
+        int mid = (l + r) >> 1;
+        update(id * 2, l, mid, i, c);
+        update(id * 2 + 1, mid + 1, r, i, c);
+        st[id] = (st[id * 2] * p[r - mid] % mod + st[id * 2 + 1]) % mod;
+    }
+    pll Get(int id, int l, int r, int u, int v) {
+        if (l > v || r < u) return {0, 0};
+//        cout<<l<<" "<<r<<" "<<st[id]<<"\n";
+        if (u <= l && r <= v) return {st[id], r - l + 1};
+        int mid = (l + r) >> 1;
+        pll left = Get(id * 2, l, mid, u, v);
+        pll right = Get(id * 2 + 1, mid + 1, r, u, v);
+        return {(left.X * p[right.Y] % mod + right.X) % mod, left.Y + right.Y};
+    }
+} st;
+
+int main() {
+//    freopen("test.inp", "r", stdin);
+//    freopen("test.out", "w", stdout);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cin>>s;
+    n = s.size();
+    base = 31;
+    cin>>mod;
+    s = " " + s;
+    p[0] = 1;
+    FOR(i, 1, n) p[i] = p[i - 1] * base % mod;
+    st.build(1, 1, n);
+    cin>>q;
+    while (q--) {
+        char type;
+        int l, r;
+        cin>>type;
+        if (type == '?') {
+            cin>>l>>r;
+            cout<<st.Get(1, 1, n, l, r).X<<"\n";
+        }
+        else {
+            int i;
+            char c;
+            cin>>i>>c;
+            s[i] = c;
+            st.update(1, 1, n, i, c);
+        }
+    }
+    return 0;
+}
