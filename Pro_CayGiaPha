@@ -1,0 +1,133 @@
+#include<bits/stdc++.h>
+#define X first
+#define Y second
+#define FOR(i, a, b) for (int i = (a); i <= (b); i++)
+#define FORD(i, b, a) for (int i = (b); i >= (a); i--)
+#define REP(i, a, b) for (int i = (a); i < (b); i++)
+#define all(x) begin(x), end(x)
+#define SQR(x) (1LL * (x) * (x))
+#define MASK(x) (1LL << (x))
+#define left Left
+#define right Right
+
+using namespace std;
+
+typedef long long ll;
+typedef double db;
+typedef long double ld;
+typedef pair<int, int> pii;
+typedef pair<int, pii> piii;
+typedef pair<ll, ll> pll;
+typedef pair<ll, pll> plll;
+typedef pair<ll, int> pli;
+typedef pair<ll, pii> plii;
+
+template<class A, class B>
+    bool maximize(A& x, B y) {
+        if (x < y) return x = y, true; else return false;
+    }
+template<class A, class B>
+    bool minimize(A& x, B y) {
+        if (x < y) return x = y, true; else return false;
+    }
+/* END OF TEMPLATE */
+
+const int N = 5e4 + 7;
+const int M = 32;
+
+int n;
+vector<int> v[N];
+ll a[N], d[N];
+
+struct Node {
+    Node* child[2];
+    Node() {
+        REP(i, 0, 2) child[i] = NULL;
+    }
+};
+
+Node* root[N];
+
+void Add(Node* root, ll x) {
+    Node* p = root;
+    FORD(i, M, 0) {
+        int bit = ((x & MASK(i)) > 0);
+        if (p->child[bit] == NULL) p->child[bit] = new Node();
+        p = p->child[bit];
+    }
+}
+
+ll Find(Node* root, ll x) {
+    if (root == NULL) return 0;
+    Node* p = root;
+    ll res = 0;
+    FORD(i, M, 0) {
+        int bit = ((x & MASK(i)) > 0);
+        if (p->child[bit ^ 1] != NULL) {
+            p = p->child[bit ^ 1];
+            res^=MASK(i);
+        }
+        else {
+            if (p->child[bit] == NULL) return res;
+            p = p->child[bit];
+        }
+    }
+    return res;
+}
+
+void dfs(int x, int par) {
+    if (x == 1) d[x] = a[x];
+    for (auto y : v[x])
+        if (y != par) {
+            d[y] = d[x] ^ a[y];
+            dfs(y, x);
+        }
+}
+
+vector<int> vec[N];
+
+ll res = 0;
+
+void DFS(int x, int par) {
+    for (auto y : v[x])
+        if (y != par) DFS(y, x);
+    Add(root[x], d[x]);
+    vec[x].push_back(x);
+    for (auto y : v[x])
+        if (y != par) {
+            if ((int)vec[x].size() < vec[y].size()) {
+                swap(vec[x], vec[y]);
+                swap(root[x], root[y]);
+            }
+            for (auto z : vec[y]) {
+                maximize(res, Find(root[x], (d[z] ^ a[x])));
+            }
+            for (auto z : vec[y]) {
+                Add(root[x], d[z]);
+                vec[x].push_back(z);
+            }
+        }
+}
+
+
+int main() {
+//    freopen("test.inp", "r", stdin);
+//    freopen("test.out", "w", stdout);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cin>>n;
+    FOR(i, 1, n) cin>>a[i];
+    FOR(i, 1, n) root[i] = new Node();
+    REP(i, 1, n) {
+        int x, y;
+        cin>>x>>y;
+        v[x].push_back(y);
+        v[y].push_back(x);
+    }
+    Add(root[1], 4);
+    dfs(1, 1);
+    DFS(1, 1);
+    cout<<res;
+    return 0;
+}
+
