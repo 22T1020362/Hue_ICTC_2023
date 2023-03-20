@@ -1,0 +1,68 @@
+#include<bits/stdc++.h>
+#define int long long
+using namespace std;
+
+const int MOD = 1e9 + 7;
+
+struct matrix
+{
+	vector<vector<int>> mt;
+	
+	matrix(int r, int c) : mt(r, vector<int> (c)) { }
+	
+	int row() const { return mt.size(); }
+	
+	int col() const { return mt[0].size(); }
+	
+	matrix I(int n)
+	{
+		matrix a = matrix(n, n);
+		for (int i = 0; i < n; i++)
+			a.mt[i][i] = 1;
+		return a;
+	}
+	
+	matrix operator * (const matrix &b)
+	{
+		matrix a = *this, c(a.row(), b.col());
+		
+		assert(a.col() == b.row());
+		
+		for (int i = 0; i < a.row(); i++)
+			for (int j = 0; j < b.col(); j++)
+				for (int k = 0; k < a.col(); k++)
+					c.mt[i][j] += a.mt[i][k] % MOD * b.mt[k][j] % MOD,
+					c.mt[i][j] %= MOD;
+			
+		return c;
+	}
+	
+	matrix pow(int mu)
+	{		
+		matrix b = *this;
+		if (mu == 0) return I(b.col());
+		if (mu == 1) return b;
+		matrix p = pow(mu / 2);
+		p = p * p;
+		if (mu % 2 == 1) return p * b;
+		return p;
+	}
+};
+
+signed main()
+{
+	int t, n;
+	matrix a(2, 2);
+	a.mt = {{1, 0, 1},
+			{1, 0, 0},
+			{0, 1, 0}};
+
+	cin >> t;
+	
+	while (t--)
+	{
+		cin >> n;
+		matrix t = a.pow(n - 2);
+		cout << (t.mt[0][0] % MOD + t.mt[0][1] % MOD + t.mt[0][2]) % MOD << '\n';
+	}
+}
