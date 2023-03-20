@@ -1,0 +1,89 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+#define fs first
+#define sc second
+#define ll long long
+#define ii pair<int,int>
+#define N 1000010
+#define pb push_back
+#define int ll
+// I am TSTer
+
+const ll mod=1e9+7;
+
+void selfmul(ll&u,ll v)
+{
+    u=(u*v)%mod;
+}
+
+ll h[N],c[N],sum[N];
+int n,m,q;
+vector<int>row,col;
+map<int,int>mp[N];
+
+ll get_sum(ll l,ll r)
+{
+    if((l+r)%2==0)
+        return ((l+r)/2%mod*((r-l+1)))%mod;
+            else return ((l+r)%mod*((r-l+1)/2))%mod;
+   // return ((l+r)%mod*((r-l+1)%mod)/2)%mod;
+}
+
+int32_t main()
+{
+    #ifdef SKY
+    freopen("A.inp","r",stdin);
+    freopen("A.out","w",stdout);
+    #endif // SKY
+    ios::sync_with_stdio(0);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    cin>>n>>m>>q;
+    for(int i=1;i<=n;i++)
+        h[i]=1;
+    for(int i=1;i<=m;i++)
+        c[i]=1;
+    for(int i=1;i<=q;i++)
+    {
+        char ch;
+        ll vt,val;
+        cin>>ch>>vt>>val;
+        if(ch=='R')
+            selfmul(h[vt],val),row.pb(vt);
+                else selfmul(c[vt],val),col.pb(vt);
+    }
+    ll res=0;
+    sort(row.begin(),row.end());
+    row.erase(unique(row.begin(),row.end()),row.end());
+    sort(col.begin(),col.end());
+    col.erase(unique(col.begin(),col.end()),col.end());
+    int S=get_sum(1,m);
+    for(auto j:col)
+        S-=j;
+    for(int i=1;i<=n;i++)
+    {
+
+       // cout<<i<<" "<<S<<" "<<S*h[i]<<endl;
+        res=(res+S*h[i])%mod;
+        S=(S+(m*(m-col.size())))%mod;
+    }
+ //   cout<<res<<endl;
+    for(auto j:col)
+    {
+        ll l=j,r=j+m*(n-1);
+        if((l+r)%2==0)
+            res=(res+(l+r)/2%mod*n%mod*c[j])%mod;
+                else res=(res+(l+r)%mod*(n/2)%mod*c[j])%mod;
+    }
+    for(auto i:row)
+        for(auto j:col)
+        {
+            ll val=(m*(i-1)+j)%mod;
+            res=(res-val*c[j])%mod;
+            res=(res+val*c[j]%mod*h[i]%mod);
+        }
+    cout<<(res+mod*mod)%mod;
+    return 0;
+}
