@@ -1,0 +1,67 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+template <class M1, class M2>
+    bool minimize(M1 &x, M2 y){
+        if(x > y){
+            x = y;
+            return true;
+        } else return false;
+    }
+
+template <class M1, class M2>
+    bool maximize(M1 &x, M2 y){
+        if(x < y){
+            x = y;
+            return true;
+        } else return false;
+    }
+
+typedef long long ll;
+typedef pair<int, int> pii;
+
+const ll INFLL = (ll)1e18 + 7;
+
+#define fi first
+#define se second
+#define mp make_pair
+
+#define MAX 100100
+
+int n;
+ll k, a[MAX], p;
+
+bool check(ll m){
+    ll s = 0;
+    for(int i = 1; i <= n; i++){
+        ll t = m / a[i];
+        ll total = t / (p + 1) * p;
+        total += t % (p + 1);
+        s += total;
+    }
+    return s >= k;
+}
+
+void solve(){
+    cin >> n >> k >> p;
+    ll mx = 0;
+    for(int i = 1; i <= n; i++) cin >> a[i];
+    ll lo = 1, hi = INFLL, ans = -1;
+    while(lo <= hi){
+        ll mid = (lo + hi) >> 1;
+        if(check(mid)){
+            hi = mid - 1;
+            ans = mid;
+        } else lo = mid + 1;
+    }
+    cout << ans << '\n';
+}
+
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    solve();
+    return 0;
+}
